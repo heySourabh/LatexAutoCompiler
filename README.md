@@ -5,7 +5,7 @@ This code constantly checks if any file has been modified in the folder and subf
 
 Basically, the tool does the following in a loop:
 
-1. Checks if any file has changed
+1. Checks if any file has changed in main folder and all subfolder
 2. if any file has changed, then runs "pdflatex" with suitable commands
 3. Checks the status returned by pdflatex command
 4. In case, the status != 0 (i.e. error has ocurred), then reads error lines from .log file and displays the error message
