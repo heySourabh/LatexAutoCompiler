@@ -1,7 +1,11 @@
 package latexautocompiler;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Scanner;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -85,5 +89,22 @@ public class FileUtils {
                 }
             }
         }
+    }
+
+    public static ArrayList<String> readLinesWithPattern(File file, Pattern pattern) {
+        ArrayList<String> strs = new ArrayList<>();
+        try {
+            Scanner sc = new Scanner(file);
+            while (sc.hasNextLine()) {
+                Scanner lineSc = new Scanner(sc.nextLine());
+                String str = lineSc.findInLine(pattern);
+                if (str != null) {
+                    strs.add(str.trim());
+                }
+            }
+        } catch (FileNotFoundException ex) {
+            // Ignore
+        }
+        return strs;
     }
 }

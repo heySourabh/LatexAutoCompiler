@@ -2,7 +2,9 @@ package latexautocompiler;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
@@ -38,7 +40,9 @@ public class LatexAutoCompiler {
                 runPdfLatex(texFile); // Run twice to take care of indexing
                 if (runPdfLatex(texFile) != 0) {
                     throw new IllegalStateException("Check log file. \n"
-                            + FileUtils.tail(new File(texFile.getAbsolutePath().replace(".tex", ".log")), 2));
+                            + combineStrings(FileUtils.readLinesWithPattern(
+                                            new File(texFile.getAbsolutePath().replace(".tex", ".log")),
+                                            Pattern.compile(".+:[0-9]+:.+"))));
                 }
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(null, "Error in compilation: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -57,9 +61,10 @@ public class LatexAutoCompiler {
 
     /**
      * Runs pdflatex and returns the status
+     *
      * @param texFile
      * @return status returned by pdflatex command
-     * @throws Exception 
+     * @throws Exception
      */
     static private int runPdfLatex(File texFile) throws Exception {
         File dir = texFile.getParentFile();
@@ -80,5 +85,14 @@ public class LatexAutoCompiler {
             // Ignore exception
         }
         return proc.exitValue();
+    }
+
+    static private String combineStrings(ArrayList<String> strings) {
+        String outStr = "";
+        for (String str : strings) {
+            outStr += "\n" + str;
+        }
+
+        return outStr;
     }
 }
