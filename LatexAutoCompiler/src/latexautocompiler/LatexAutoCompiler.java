@@ -1,5 +1,6 @@
 package latexautocompiler;
 
+import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -38,12 +39,14 @@ public class LatexAutoCompiler {
             System.out.println("Latest modified file: " + FileUtils.getLatestModifiedFile(dir));
             try {
                 runPdfLatex(texFile); // Run twice to take care of indexing
-                if (runPdfLatex(texFile) != 0) {
+                if (runPdfLatex(texFile) != 0) { // Check for error in compilation
                     throw new IllegalStateException("Check log file. \n"
                             + combineStrings(FileUtils.readLinesWithPattern(
                                             new File(texFile.getAbsolutePath().replace(".tex", ".log")),
                                             Pattern.compile(".+:[0-9]+:.+"))));
                 }
+                // Open pdf file:
+                Desktop.getDesktop().open(new File(texFile.getAbsolutePath().replace(".tex", ".pdf")));
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(null, "Error in compilation: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
@@ -79,7 +82,7 @@ public class LatexAutoCompiler {
                 dir
         );
         try {
-            proc.waitFor(30, TimeUnit.SECONDS);
+            proc.waitFor(1, TimeUnit.MINUTES);
             proc.destroy();
         } catch (InterruptedException ex) {
             // Ignore exception
